@@ -6,10 +6,14 @@ import * as tus from 'tus-js-client';
 
 
 export class uploadFiles {
+    name: string = '';
+    type: string = '';
     constructor(public video: File, public path: string, public uploadURI: string) {
         this.video = video;
         this.path = path;
         this.uploadURI = uploadURI;
+        this.name = video.name;
+        this.type = video.type;
     }
 }
 
@@ -31,8 +35,12 @@ export class AppComponent {
             console.log(response);
             const videoFile = new uploadFiles(file, response.link, response.upload.upload_link);
             const fileUpload = this.upload.tusUpload(videoFile, this.success);
+            // fileUpload.findPreviousUploads().then((previousUploads) => {
+            //     console.log('Previous uploads');
+            //     console.log(previousUploads);
+            // });
             fileUpload.start();
-        })
+        });
 
     }
 
