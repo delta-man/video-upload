@@ -11,7 +11,7 @@ import { uploadFiles } from './app.component';
 export class UploadService {
     constructor(private http: HttpClient) { }
     private api = 'https://api.vimeo.com/me/videos';
-    private accessToken = 'API_KEY';
+    private accessToken = '';
 
     createVideo(file: File): Observable<any> {
         const body = {
@@ -29,6 +29,27 @@ export class UploadService {
         return this.http.post(this.api, body, { headers: header })
     }
 
+    uploadVideo(file: File, uploadOffset: string, url): Observable<any> {
+        const header: HttpHeaders = new HttpHeaders()
+            // .set('Authorization', 'bearer ' + this.accessToken)
+            .set('Tus-Resumable', '1.0.0')
+            .set('Upload-Offset', '0')
+            .set('Content-Type', 'application/offset+octet-stream')
+            .set('Accept', 'application/vnd.vimeo.*+json;version=3.4');
+        return this.http.patch(url, file, { headers: header });
+    }
+
+    getStatus(url: string): Observable<any> {
+        const header: HttpHeaders = new HttpHeaders()
+            .set('Tus-Resumable', '1.0.0')
+            .set('Accept', 'application/vnd.vimeo.*+json;version=3.4');
+        return this.http.head(url, { headers: header, observe: 'response' });
+    }
+
+
+
+
+
     public tusUpload(
         file: uploadFiles,
         success: any
@@ -39,6 +60,7 @@ export class UploadService {
             endpoint: file.uploadURI,
             storeFingerprintForResuming: true,
             removeFingerprintOnSuccess: false,
+            chunkSize: 134217728,
             retryDelays: [0, 1000, 3000, 5000, 10000],
             onError: error => {
                 console.log('Failed: ' + file.video.name + error);

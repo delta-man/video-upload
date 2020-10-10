@@ -34,6 +34,43 @@ export class AppComponent {
             fileUpload.start();
         })
 
+        // // Save and resume Section
+        // let offSet = 0;
+        // const key = `${file.name}.${file.size}`;
+        // // Checking file details in localstorage
+        // if (localStorage.getItem(key)) {
+        //     console.log('File already in uploading status');
+        //     const metaData = JSON.parse(localStorage.getItem(key));
+        //     const { url } = metaData;
+        //     this.upload.getStatus(url).subscribe(response => {
+        //         console.log('Uploading status');
+        //         console.log(response);
+        //         offSet = response.headers.get('Upload-Offset');
+        //         this.upload.uploadVideo(file, offSet.toString(), url).subscribe(patchResponse => {
+        //             console.log(patchResponse);
+        //             console.log('Successfully uploaded');
+        //             localStorage.removeItem(key);
+        //         });
+        //     });
+        // }
+        // else {
+        //     console.log('New upload');
+        //     this.upload.createVideo(file).subscribe(response => {
+        //         const metaData = {
+        //             name: file.name,
+        //             size: file.size,
+        //             url: response.upload.upload_link
+        //         };
+        //         localStorage.setItem(key, JSON.stringify(metaData));
+        //         this.upload.uploadVideo(file, offSet.toString(), response.upload.upload_link).subscribe(patchResponse => {
+        //             console.log(patchResponse);
+        //             console.log('Successfully uploaded');
+        //             localStorage.removeItem(key);
+        //         });
+        //     });
+        // }
+
+
     }
 
     success = () => {
