@@ -23,16 +23,22 @@ export class AppComponent {
     videoList: FileList;
     videoLinks = [];
     pendingFiles: uploadFiles[] = [];
-    constructor(private upload: UploadService) { }
+    progress: string = '0';
+    constructor(private upload: UploadService) {
+        this.upload.onProgress.subscribe((data: any) => {
+            this.progress = data;
+        });
+    }
 
     public start(files: FileList) {
         var file = files[0];
         this.upload.createVideo(file).subscribe(response => {
             console.log(response);
+            console.time('uploadTime');
             const videoFile = new uploadFiles(file, response.link, response.upload.upload_link);
             const fileUpload = this.upload.tusUpload(videoFile, this.success);
             fileUpload.start();
-        })
+        });
 
         // // Save and resume Section
         // let offSet = 0;
@@ -75,5 +81,6 @@ export class AppComponent {
 
     success = () => {
         console.log('after video upload section');
+        console.timeEnd('uploadTime');
     };
 }

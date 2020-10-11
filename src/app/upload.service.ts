@@ -1,5 +1,5 @@
 // Filename: upload.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import * as tus from 'tus-js-client';
 import { Observable } from 'rxjs';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
@@ -9,9 +9,10 @@ import { uploadFiles } from './app.component';
     providedIn: 'root'
 })
 export class UploadService {
+    onProgress = new EventEmitter<any>();
     constructor(private http: HttpClient) { }
     private api = 'https://api.vimeo.com/me/videos';
-    private accessToken = '';
+    private accessToken = 'API_KEY';
 
     createVideo(file: File): Observable<any> {
         const body = {
@@ -46,6 +47,8 @@ export class UploadService {
         return this.http.head(url, { headers: header, observe: 'response' });
     }
 
+    public uploadProgres: string = '0';
+
 
 
 
@@ -55,18 +58,20 @@ export class UploadService {
         success: any
     ): tus.Upload {
         console.log(`TUS Supported ${tus.isSupported}`);
+        const chunkSizeInMb = 256;
         const upload = new tus.Upload(file.video, {
             uploadUrl: file.uploadURI,
             endpoint: file.uploadURI,
             storeFingerprintForResuming: true,
             removeFingerprintOnSuccess: false,
-            chunkSize: 134217728,
+            chunkSize: chunkSizeInMb * 1048576,// 67108864,//134217728,//67108864,//134217728,//201326592,//268435456,//536870912,
             retryDelays: [0, 1000, 3000, 5000, 10000],
             onError: error => {
                 console.log('Failed: ' + file.video.name + error);
             },
             onProgress: (bytesUploaded, bytesTotal) => {
                 const percentage = ((bytesUploaded / bytesTotal) * 100).toFixed(2);
+                this.onProgress.emit(percentage);
                 console.log(
                     bytesUploaded,
                     bytesTotal,
